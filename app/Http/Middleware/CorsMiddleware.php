@@ -10,13 +10,18 @@ class CorsMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
+        $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+
         $allowedOrigins = [
             'http://localhost:3000',
             'http://127.0.0.1:3000',
+            $frontendUrl,
         ];
 
         $origin = $request->headers->get('Origin');
-        $allowOrigin = in_array($origin, $allowedOrigins, true) ? $origin : 'http://localhost:3000';
+        $allowOrigin = in_array($origin, $allowedOrigins, true)
+            ? $origin
+            : $frontendUrl;
 
         if ($request->getMethod() === 'OPTIONS') {
             return response('', 204)
