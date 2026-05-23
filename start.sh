@@ -2,6 +2,11 @@
 
 set -e
 
+echo "Preparing SQLite database..."
+mkdir -p database
+touch database/database.sqlite
+chmod -R 775 database
+
 echo "Clearing Laravel cache..."
 php artisan optimize:clear
 

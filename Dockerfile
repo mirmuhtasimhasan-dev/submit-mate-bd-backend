@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     libzip-dev \
     libonig-dev \
-    && docker-php-ext-install pdo_mysql mbstring zip \
+    libsqlite3-dev \
+    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring zip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -26,7 +27,9 @@ RUN mkdir -p storage/framework/cache \
     storage/logs \
     storage/app/public \
     bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+    database \
+    && touch database/database.sqlite \
+    && chmod -R 775 storage bootstrap/cache database
 
 RUN composer dump-autoload --optimize
 
