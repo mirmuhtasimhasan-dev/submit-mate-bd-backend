@@ -10,18 +10,19 @@ class CorsMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $frontendUrl = rtrim(env('FRONTEND_URL', 'http://localhost:3000'), '/');
+        $origin = $request->headers->get('Origin');
 
         $allowedOrigins = [
             'http://localhost:3000',
             'http://127.0.0.1:3000',
-            $frontendUrl,
+            env('FRONTEND_URL'),
         ];
 
-        $origin = $request->headers->get('Origin');
-        $allowOrigin = in_array($origin, $allowedOrigins, true)
+        $isNetlify = $origin && str_ends_with(parse_url($origin, PHP_URL_HOST) ?? '', '.netlify.app');
+
+        $allowOrigin = in_array($origin, array_filter($allowedOrigins), true) || $isNetlify
             ? $origin
-            : $frontendUrl;
+            : 'http://localhost:3000';
 
         if ($request->getMethod() === 'OPTIONS') {
             return response('', 204)

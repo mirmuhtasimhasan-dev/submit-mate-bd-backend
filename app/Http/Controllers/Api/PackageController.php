@@ -13,7 +13,7 @@ class PackageController extends Controller
     {
         $packages = Package::with('service')
             ->where('is_active', true)
-            ->orderByRaw("FIELD(tier, 'basic', 'standard', 'express')")
+            ->orderByRaw("CASE tier WHEN 'basic' THEN 1 WHEN 'standard' THEN 2 WHEN 'express' THEN 3 ELSE 4 END")
             ->orderBy('price', 'asc')
             ->get();
 
@@ -48,7 +48,7 @@ class PackageController extends Controller
     {
         $packages = Package::where('service_id', $serviceId)
             ->where('is_active', true)
-            ->orderByRaw("FIELD(tier, 'basic', 'standard', 'express')")
+            ->orderByRaw("CASE tier WHEN 'basic' THEN 1 WHEN 'standard' THEN 2 WHEN 'express' THEN 3 ELSE 4 END")
             ->orderBy('price', 'asc')
             ->get();
 
@@ -70,7 +70,8 @@ class PackageController extends Controller
 
         $packages = Package::with('service')
             ->orderBy('service_id')
-            ->orderByRaw("FIELD(tier, 'basic', 'standard', 'express')")
+            ->orderByRaw("CASE tier WHEN 'basic' THEN 1 WHEN 'standard' THEN 2 WHEN 'express' THEN 3 ELSE 4 END")
+            ->orderBy('price', 'asc')
             ->get();
 
         return response()->json([
@@ -103,7 +104,9 @@ class PackageController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        $slug = $validated['slug'] ?? Str::slug($validated['name'] . '-' . $validated['tier'] . '-' . $validated['service_id']);
+        $slug = $validated['slug'] ?? Str::slug(
+            $validated['name'] . '-' . $validated['tier'] . '-' . $validated['service_id']
+        );
 
         $package = Package::create([
             'service_id' => $validated['service_id'],
